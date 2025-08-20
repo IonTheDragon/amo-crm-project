@@ -342,146 +342,157 @@ app.post('/webhook', async (req, res) => {
     const data = req.body;
 
     if ("leads" in data) {
-    	let lead = false;
+    	let leads = [];
 	    if ("add" in data.leads) {
 	    	//lead = data.leads.add[0]
 	    	return res.status(200).json({status: 'success'});
 	    }
 	    if ("update" in data.leads) {
-	    	lead = data.leads.update[0]
+	    	leads = data.leads.update
 	    }
 
-	    if (lead) {
-			deal_db = await db.Deal.findOne({
-			  where: {
-			    crm_id: lead.id,
-			  },
-			});
+	    if (leads.length) {
+	    	for (let key in leads) {
 
-			if (deal_db === null) {
-				deal_db = await db.Deal.create(
-					{ 
+	    		lead = leads[key]
+
+				deal_db = await db.Deal.findOne({
+				  where: {
+				    crm_id: lead.id,
+				  },
+				});
+
+				if (deal_db === null) {
+					deal_db = await db.Deal.create(
+						{ 
+					      	name: lead.name,
+					      	price: lead.price,
+					      	status: lead.status_id,
+					      	crm_id: lead.id, 
+						}
+					);
+					//console.log('Received data:', deal_db)				
+				} else {
+					await db.Deal.update(
+				      { 
 				      	name: lead.name,
 				      	price: lead.price,
-				      	status: lead.status_id,
-				      	crm_id: lead.id, 
-					}
-				);
-				//console.log('Received data:', deal_db)				
-			} else {
-				await db.Deal.update(
-			      { 
-			      	name: lead.name,
-			      	price: lead.price,
-			      	status: lead.status_id
-			      },
-			      {
-			        where: {
-			          crm_id: lead.id,
-			        }, 
-			      }
-			    )
+				      	status: lead.status_id
+				      },
+				      {
+				        where: {
+				          crm_id: lead.id,
+				        }, 
+				      }
+				    )
+				}
 			}
 	    }	    
     }
 
     if ("contacts" in data) {
-    	let contact = false
+    	let contacts = []
 	    if ("add" in data.contacts) {
 	    	//contact = data.contacts.add[0]
 	    	return res.status(200).json({status: 'success'});
 	    }
 	    if ("update" in data.contacts) {
-	    	contact = data.contacts.update[0]
+	    	contacts = data.contacts.update
 	    }
 
-	    if (contact) {
+	    if (contacts.length) {
 
-		    let phone_obj = contact.custom_fields.filter(item => item.code === 'PHONE')
+	    	for (let key in contacts) {
 
-		    //console.log('Received data:', phone_obj)
+	    		contact = contacts[key]
 
-		    let phone = '';
-		    if (typeof phone_obj[0] != 'undefined' && "values" in phone_obj[0]) {
-		    	phone = phone_obj[0]["values"][0]["value"]
-			}
+			    let phone_obj = contact.custom_fields.filter(item => item.code === 'PHONE')
 
-		    //console.log('Received data:', phone)
+			    //console.log('Received data:', phone_obj)
 
-		    let email_obj = contact.custom_fields.filter(item => item.code === 'EMAIL')
+			    let phone = '';
+			    if (typeof phone_obj[0] != 'undefined' && "values" in phone_obj[0]) {
+			    	phone = phone_obj[0]["values"][0]["value"]
+				}
 
-		    let email = '';
-		    if (typeof email_obj[0] != 'undefined' && "values" in email_obj[0]) {
-		    	email = email_obj[0]["values"][0]["value"]
-			}
+			    //console.log('Received data:', phone)
 
-			//console.log('Received data:', email)
+			    let email_obj = contact.custom_fields.filter(item => item.code === 'EMAIL')
 
-			contact_db = await db.Contact.findOne({
-			  where: {
-			    crm_id: contact.id,
-			  },
-			});
+			    let email = '';
+			    if (typeof email_obj[0] != 'undefined' && "values" in email_obj[0]) {
+			    	email = email_obj[0]["values"][0]["value"]
+				}
 
-			if (contact_db === null) {
-				contact_db = await db.Contact.create(
-					{ 
+				//console.log('Received data:', email)
+
+				contact_db = await db.Contact.findOne({
+				  where: {
+				    crm_id: contact.id,
+				  },
+				});
+
+				if (contact_db === null) {
+					contact_db = await db.Contact.create(
+						{ 
+					      	name: contact.name,
+				      		phone: phone,
+				      		email: email,				      	
+					      	crm_id: contact.id, 
+						}
+					);
+				} else {
+					await db.Contact.update(
+				      { 
 				      	name: contact.name,
-			      		phone: phone,
-			      		email: email,				      	
-				      	crm_id: contact.id, 
-					}
-				);
-			} else {
-				await db.Contact.update(
-			      { 
-			      	name: contact.name,
-			      	phone: phone,
-			      	email: email
-			      },
-			      {
-			        where: {
-			          crm_id: contact.id,
-			        }, 
-			      }
-			    )				
-			}
+				      	phone: phone,
+				      	email: email
+				      },
+				      {
+				        where: {
+				          crm_id: contact.id,
+				        }, 
+				      }
+				    )				
+				}
 
-		    if ("linked_leads_id" in contact) {
-				for (linked_leads_id in contact.linked_leads_id) {
+			    if ("linked_leads_id" in contact) {
+					for (linked_leads_id in contact.linked_leads_id) {
 
-					deals = await db.Deal.findAll({
-					  where: {
-					    crm_id: linked_leads_id,
-					  },
-					});
-
-					//console.log('Received data:', deals)
-
-					if (deals.length) {
-
-						deal_contact = await db.DealContact.findOne({
+						deals = await db.Deal.findAll({
 						  where: {
-						    dealId: deals[0].id,
-						    contactId: contact_db.id
+						    crm_id: linked_leads_id,
 						  },
 						});
 
-						if (deal_contact === null) {	
+						//console.log('Received data:', deals)
 
-							//console.log('Received data:', deals[0].id)
-							//console.log('Received data:', contact_db.id)
+						if (deals.length) {
 
-							await db.DealContact.create(
-								{ 
-								    DealId: deals[0].id,
-								    ContactId: contact_db.id
-								}
-							);
-						}
-					}					
-				}	    	
-		    }
+							deal_contact = await db.DealContact.findOne({
+							  where: {
+							    dealId: deals[0].id,
+							    contactId: contact_db.id
+							  },
+							});
+
+							if (deal_contact === null) {	
+
+								//console.log('Received data:', deals[0].id)
+								//console.log('Received data:', contact_db.id)
+
+								await db.DealContact.create(
+									{ 
+									    DealId: deals[0].id,
+									    ContactId: contact_db.id
+									}
+								);
+							}
+						}					
+					}	    	
+			    }
+
+			}
 
 		}	    
     }    	
