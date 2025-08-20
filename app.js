@@ -65,84 +65,7 @@ app.post("/create", async (req, res) => {
     const contact_phone = req.body.contact_phone;
     const contact_email = req.body.contact_email;
 
-	contact_db = await db.Contact.findOne ({
-	  where: {
-	    phone: contact_phone,
-	  },
-	});
-
-	if (contact_db === null) {
-		contact_db = await db.Contact.create(
-			{ 
-		      	name: contact_name,
-	      		phone: contact_phone,
-	      		email: contact_email,				      	
-		      	crm_id: 0, 
-			}
-		);
-	} else {
-		await db.Contact.update(
-	      { 
-	      	name: contact_name,
-	      	phone: contact_phone,
-	      	email: contact_email
-	      },
-	      {
-	        where: {
-	          id: contact_db.id,
-	        }, 
-	      }
-	    )
-	}
-
-	deal_db = await db.Deal.findOne({
-	  where: {
-	    name: name,
-	  },
-	});
-
-	if (deal_db === null) {
-		deal_db = await db.Deal.create(
-			{ 
-		      	name: name,
-		      	price: price,
-		      	status: status,
-		      	crm_id: 0, 
-			}
-		);
-	} else {
-		await db.Deal.update(
-	      { 
-	      	price: price,
-	      	status: status, 
-	      },
-	      {
-	        where: {
-	          id: deal_db.id,
-	        }, 
-	      }
-	    )		
-	}
-
-	deal_contact = await db.DealContact.findOne({
-	  where: {
-	    dealId: deal_db.id,
-	    contactId: contact_db.id
-	  },
-	});
-
-	if (deal_contact === null) {	
-
-		//console.log('Received data:', deals[0].id)
-		//console.log('Received data:', contact_db.id)
-
-		await db.DealContact.create(
-			{ 
-			    DealId: deal_db.id,
-			    ContactId: contact_db.id
-			}
-		);
-	}
+    //console.log('Received data:', req.body)
 
 	settings = await db.Settings.findOne({
 	  where: {
@@ -254,20 +177,7 @@ app.post("/create", async (req, res) => {
 		        body: JSON.stringify(dataToSend)
 		    });
 
-		    responseData = await response.json();
-
-		    contact = responseData._embedded.contacts[0]
-
-			await db.Contact.update(
-		      { 
-		      	crm_id: contact.id,
-		      },
-		      {
-		        where: {
-		          id: contact_db.id,
-		        }, 
-		      }
-		    )		    
+		    responseData = await response.json();		    
 	    }
 
 		contact_crm_id = contact.id
@@ -358,22 +268,7 @@ app.post("/create", async (req, res) => {
 		        body: JSON.stringify(dataToSend)
 		    });
 
-		    responseData = await response.json();
-
-		    //console.log('Received data:', responseData['validation-errors'][0]['errors'])
-
-		    lead = responseData._embedded.leads[0]
-
-			await db.Deal.update(
-		      { 
-		      	crm_id: lead.id,
-		      },
-		      {
-		        where: {
-		          id: deal_db.id,
-		        }, 
-		      }
-		    )		    
+		    responseData = await response.json();	    
 	    }	
 	}		    
 
