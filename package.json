@@ -1,0 +1,31 @@
+{
+  "name": "amo-crm-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IonTheDragon/amo-crm-project.git"
+  },
+  "author": "IonTheDragon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IonTheDragon/amo-crm-project/issues"
+  },
+  "homepage": "https://github.com/IonTheDragon/amo-crm-project#readme",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "express-handlebars": "^8.0.3",
+    "hbs": "^4.2.0",
+    "mysql2": "^3.14.3",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.3"
+  }
+}
