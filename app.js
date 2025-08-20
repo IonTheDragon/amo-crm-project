@@ -217,7 +217,7 @@ app.post("/create", async (req, res) => {
 		    responseData = await response.json();
 
 		    //console.log('Received data:', responseData['validation-errors'][0]['errors'])
-		    console.log('Received data:', responseData)
+		    //console.log('Received data:', responseData)
 
 	    } else {
 			dataToSend = [{
