@@ -344,7 +344,8 @@ app.post('/webhook', async (req, res) => {
     if ("leads" in data) {
     	let lead = false;
 	    if ("add" in data.leads) {
-	    	lead = data.leads.add[0]
+	    	//lead = data.leads.add[0]
+	    	return res.status(200).json({status: 'success'});
 	    }
 	    if ("update" in data.leads) {
 	    	lead = data.leads.update[0]
@@ -365,7 +366,8 @@ app.post('/webhook', async (req, res) => {
 				      	status: lead.status_id,
 				      	crm_id: lead.id, 
 					}
-				);				
+				);
+				//console.log('Received data:', deal_db)				
 			} else {
 				await db.Deal.update(
 			      { 
@@ -386,7 +388,8 @@ app.post('/webhook', async (req, res) => {
     if ("contacts" in data) {
     	let contact = false
 	    if ("add" in data.contacts) {
-	    	contact = data.contacts.add[0]
+	    	//contact = data.contacts.add[0]
+	    	return res.status(200).json({status: 'success'});
 	    }
 	    if ("update" in data.contacts) {
 	    	contact = data.contacts.update[0]
@@ -452,6 +455,8 @@ app.post('/webhook', async (req, res) => {
 					    crm_id: linked_leads_id,
 					  },
 					});
+
+					//console.log('Received data:', deals)
 
 					if (deals.length) {
 
